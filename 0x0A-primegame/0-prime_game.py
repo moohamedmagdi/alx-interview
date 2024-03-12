@@ -1,32 +1,57 @@
 #!/usr/bin/python3
-""" module for prime game task """
+"""Module defining isWinner function."""
 
 
-def isWinner(x, nums: list):
-    """ method to find the winner of x games between maria and ben
-    """
-    if x < 0 or not nums or x != len(nums):
-        return None
-    b = 0
-    m = 0
-    for n in nums:
-        if n == 0:
+def isWinner(x, nums):
+    """Function to get who has won in prime game"""
+    mariaWinsCount = 0
+    benWinsCount = 0
+
+    for num in nums:
+        roundsSet = list(range(1, num + 1))
+        primesSet = primes_in_range(1, num)
+
+        if not primesSet:
+            benWinsCount += 1
             continue
-        arr = [i for i in range(2, n + 1)]
-        who = True
-        for n in arr:
-            for i in range(2, int(n ** 0.5) + 1):
-                if n % i == 0:
-                    who = not who
-                    break
-            who = not who
-        if who:
-            b += 1
-        else:
-            m += 1
-    if b > m:
-        return 'Ben'
-    elif m > b:
-        return 'Maria'
-    else:
-        return None
+
+        isMariaTurns = True
+
+        while(True):
+            if not primesSet:
+                if isMariaTurns:
+                    benWinsCount += 1
+                else:
+                    mariaWinsCount += 1
+                break
+
+            smallestPrime = primesSet.pop(0)
+            roundsSet.remove(smallestPrime)
+
+            roundsSet = [x for x in roundsSet if x % smallestPrime != 0]
+
+            isMariaTurns = not isMariaTurns
+
+    if mariaWinsCount > benWinsCount:
+        return "Winner: Maria"
+
+    if mariaWinsCount < benWinsCount:
+        return "Winner: Ben"
+
+    return None
+
+
+def is_prime(n):
+    """Returns True if n is prime, else False."""
+    if n < 2:
+        return False
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+
+def primes_in_range(start, end):
+    """Returns a list of prime numbers between start and end (inclusive)."""
+    primes = [n for n in range(start, end+1) if is_prime(n)]
+    return primes
